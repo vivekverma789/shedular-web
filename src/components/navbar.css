@@ -1,0 +1,66 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+.heading {
+  font-family: "Baloo Bhaijaan 2", sans-serif;
+}
+
+.links {
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19.36px;
+  text-align: left;
+}
+
+.dropdown {
+  font-family: Inter;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 18.15px;
+  text-align: left;
+}
+
+.hero-content {
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24.2px;
+  text-align: left;
+}
+
+.courses {
+  font-family: Inter;
+font-size: 20px;
+font-weight: 500;
+line-height: 24.2px;
+text-align: left;
+
+}
+
+.form {
+  font-family: Inter;
+}
+
+/* navbar.css */
+.mobile-menu-enter {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.mobile-menu-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.mobile-menu-exit {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.mobile-menu-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+}
