@@ -151,12 +151,12 @@ console.log(location.pathname)
               >
                 <img src={logout} className="mr-2" alt="Sign Out" /> Login
               </Link>
-              <Link
+              {/* <Link
                 to="/register"
                 className="flex gap-2 items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <img src={logout} className="mr-2" alt="Sign Out" /> Register
-              </Link>
+              </Link> */}
               <hr />
               <Link
                 to="/hiring"

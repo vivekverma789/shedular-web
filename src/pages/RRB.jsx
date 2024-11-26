@@ -1,7 +1,12 @@
 import { useState } from "react";
 import "../components/navbar.css";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const RRB = () => {
+  const location = useLocation();
+  const selectedOption = location.state?.selectedOption || "No option selected";
+console.log(selectedOption)
   const [formData, setFormData] = useState({
     fullName: "",
     employeeNo: "",
@@ -13,6 +18,11 @@ const RRB = () => {
     desiredPosting: "",
     proofFile: null,
     additionalDetail: "",
+    currentZone: "", // Added field
+    currentDivision: "", // Added field
+    desiredZone: "", // Added field
+    desiredDivision: "", // Added field
+    department: "",
   });
 
   const handleChange = (e) => {
@@ -24,11 +34,29 @@ const RRB = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-  };
+    const formDataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+    formDataToSend.append("selectedGoal", selectedOption); // Add selected option to the form data
 
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/mutual-transfer/save",
+        formDataToSend,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      alert("Form submitted successfully!");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error submitting the form:", error.message);
+      alert("There was an error submitting your form. Please try again.");
+    }
+  };
   return (
     <div className="form flex justify-center items-center bg-gray-100">
       <div className="bg-white p-10 rounded shadow-md w-full mt-10 mb-10 max-w-3xl">
@@ -107,8 +135,8 @@ const RRB = () => {
             <div className="flex text-sm gap-3 flex-col">
               <label className="block text-sm text-gray-700">Department *</label>
               <select
-                name="post"
-                value={formData.post}
+                name="department"
+                value={formData.department}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required
@@ -138,8 +166,8 @@ const RRB = () => {
                 Current zone *
               </label>
               <select
-                name="currentPosting"
-                value={formData.currentPosting}
+                name="currentZone"
+                value={formData.currentZone}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required
@@ -154,9 +182,8 @@ const RRB = () => {
                 Current division *
               </label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                name="currentDivision"
+                value={formData.currentDivision}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required
@@ -185,9 +212,8 @@ const RRB = () => {
                 Desired zone *
               </label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                name="desiredZone"
+                value={formData.desiredZone}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required
@@ -198,9 +224,8 @@ const RRB = () => {
                 Desired division *
               </label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                name="desiredDivision"
+                value={formData.desiredDivision}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required
@@ -211,9 +236,8 @@ const RRB = () => {
                 Desired posting station(s) *
               </label>
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                name="desiredPosting"
+                value={formData.desiredPosting}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded w-full"
                 required

@@ -22,7 +22,7 @@ const Form = () => {
         { name: "SSC", image: SSC },
         { name: "RRB", image: RRB },
         { name: "BANKING", image: Banking },
-        { name: "OTHER", image: Others },
+        // { name: "OTHER", image: Others },
       ],
     },
     {
@@ -45,17 +45,17 @@ const Form = () => {
           { name: "SBI PO", image: Banking },
           { name: "SBI Clerk", image: Banking },
         ],
-        OTHER: [
-          { name: "Other Exam 1", image: Others },
-          { name: "Other Exam 2", image: Others },
-        ],
+        // OTHER: [
+        //   { name: "Other Exam 1", image: Others },
+        //   { name: "Other Exam 2", image: Others },
+        // ],
       },
     },
     {
       title: "Which category you fall",
       options: [
-        { name: "Fresher", image: fresher },
-        { name: "Repeater", image: repeater },
+        { name: "FRESHER", image: fresher },
+        { name: "REPEATER", image: repeater },
       ],
     },
     {
@@ -74,11 +74,11 @@ const Form = () => {
       ],
     },
     {
-      title: "Your customized schedule",
+      title: "You want to finish preparation within",
       options: [
-        { name: "3 Months (8 hrs/day)", image: less5 },
-        { name: "6 Months (6 hrs/day)", image: more5 },
-        { name: "9 Months (4 hrs/day)", image: more5 },
+        { name: "60-days", image: less5 },
+        { name: "120-days", image: more5 },
+        { name: "150-days", image: more5 },
       ],
     },
   ];
@@ -113,9 +113,30 @@ const Form = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Form submitted with answers:", selectedOptions);
-    navigate("/customised-schedule");
+    // Extract selected option names
+    const stageMapping = {
+      "PRELIMS (TIER 1)": "PRELIMS",
+      "MAINS (TIER 2)": "MAINS",
+      "PRELIMS + MAINS": "PRELIMS+MAINS",
+    };
+    const submissionData = {
+      goal: selectedOptions[1]?.name, // Goal selected in step 1
+      exam: selectedOptions[2]?.name.split(" ")[1], // Exam selected in step 2
+      category: selectedOptions[3]?.name, // Category selected in step 3
+      hrsanddays: selectedOptions[5]?.name.includes("Less")
+        ? "<5"
+        : ">5", // Hours per day in step 5
+      stage: stageMapping[selectedOptions[4]?.name], // Stage selected in step 4
+      duration: selectedOptions[6]?.name, // Stage selected in step 4
+
+    };
+  
+    console.log("Form submitted with data:", submissionData);
+  
+    // Navigate to the customised schedule page and pass the data
+    navigate("/customised-schedule", { state: { submissionData } });
   };
+  
 
   const getCurrentOptions = () => {
     if (currentPage === 2) {

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import "../components/navbar.css";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const PersonalInfoForm = () => {
+  const location = useLocation();
+  const selectedOption = location.state?.selectedOption || "No option selected";
+console.log(selectedOption)
   const [formData, setFormData] = useState({
     fullName: "",
     employeeNo: "",
@@ -24,9 +29,28 @@ const PersonalInfoForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    const formDataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+    formDataToSend.append("selectedGoal", selectedOption); // Add selected option to the form data
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/mutual-transfer/save",
+        formDataToSend,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      alert("Form submitted successfully!");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error submitting the form:", error.message);
+      alert("There was an error submitting your form. Please try again.");
+    }
   };
 
   return (

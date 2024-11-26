@@ -1,106 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import SSC from "../assets/SSC.png";
 import "./navbar.css";
 
-// Simulate data fetched from an API or backend
-const dummyData = {
-  customSchedule: {
-    duration: "3 MONTHS",
-    hoursPerDay: 6,
-    exam: "SSC CGL Pre + Mains",
-    features: [
-      "New pattern resources",
-      "Mocks included",
-      "GS included",
-      "24*7 access",
-    ],
-    price: 29,
-  },
-  similarSchedules: [
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "SSC CGL Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "SSC CGL Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "SSC CGL Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-  ],
-  otherExams: [
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "RRB GD Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "RRB GD Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-    {
-      duration: "3 MONTHS",
-      hoursPerDay: 6,
-      exam: "RRB GD Pre",
-      features: [
-        "New pattern resources",
-        "Mocks included",
-        "GS included",
-        "24*7 access",
-      ],
-      price: 29,
-    },
-  ],
+const handlePurchase = async (schedule) => {
+  try {
+    // const userId = "your-user-id"; // Replace with actual user ID from your auth context or state
+    const response = await axios.post("http://localhost:5000/api/purchase", {
+      // userId,
+      scheduleId: schedule.id,
+      goalId: schedule.goalId,
+      goal: schedule.goal,
+      duration: schedule.duration,
+      exam: schedule.exam,
+      features: schedule.features,
+      price: schedule.price,
+    });
+
+    console.log("Purchase Response:", response.data);
+    alert("Schedule purchased successfully!");
+  } catch (error) {
+    console.error("Error purchasing schedule:", error.message);
+    alert("Failed to purchase schedule. Please try again later.");
+  }
 };
 
-// A reusable card component to display schedules
 const ScheduleCard = ({ schedule, isPrimary = false, index }) => (
   <div
     className={`rounded-lg shadow p-5 ${
       isPrimary ? "bg-green-100" : "bg-gray-100"
-    } `}
-    style={{ animationDelay: `${index * 0.2}s` }} // Adding a delay for each card
+    }`}
+    style={{ animationDelay: `${index * 0.2}s` }}
   >
     <div className="flex gap-3 mb-2">
       <img className="h-[40px] w-[40px]" src={SSC} alt="SSC" />
@@ -115,8 +45,8 @@ const ScheduleCard = ({ schedule, isPrimary = false, index }) => (
     </div>
     <hr className="h-[2px] mb-[1.5rem] rounded-md bg-black" />
     <ul className="form text-sm mb-6">
-      {schedule.features.map((feature, index) => (
-        <li key={index} className="flex text-sm font-semibold items-center">
+      {schedule.features.map((feature, idx) => (
+        <li key={idx} className="flex text-sm font-semibold items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4 mr-1 text-[#1A6400]"
@@ -135,32 +65,71 @@ const ScheduleCard = ({ schedule, isPrimary = false, index }) => (
     </ul>
     <div className="flex justify-end gap-[1.5rem] items-center">
       <p className="form font-bold">₹{schedule.price}</p>
-      <button className="form bg-[#1A6400] text-white px-4 py-2 rounded">
+      <button className="form bg-[#1A6400] text-white px-4 py-2 rounded"
+       onClick={() => handlePurchase(schedule)}
+       >
         Buy Now
       </button>
     </div>
   </div>
 );
 
-const SuggestedCourse = () => {
+const SuggestedCourse = ({ selectedOptions }) => {
+  const [customSchedule, setCustomSchedule] = useState(null);
+  const [similarSchedules, setSimilarSchedules] = useState([]);
+  const [otherExams, setOtherExams] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        if (!selectedOptions) {
+          throw new Error("Selected options are missing!");
+        }
+
+        console.log("Sending selectedOptions to server:", selectedOptions);
+
+        const response = await axios.post(
+          "http://localhost:5000/api/schedule/match",
+          selectedOptions
+        );
+
+        console.log("Server Response:", response.data);
+
+        const { customSchedule, similarSchedules, otherExams } = response.data;
+        setCustomSchedule(customSchedule);
+        setSimilarSchedules(similarSchedules);
+        setOtherExams(otherExams);
+      } catch (err) {
+        console.error("Error fetching schedules:", err.message);
+        setError("Failed to load schedules. Please try again later.");
+      }
+    };
+
+    fetchSchedules(); // Automatically send data to server
+  }, [selectedOptions]);
+
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!customSchedule) return <p>Loading schedules...</p>;
+
   return (
     <div className="container mx-auto p-4 md:px-[4rem] lg:px-[4rem] animate-fadeIn">
       <h2 className="form text-lg font-semibold mb-4">Your customized schedule</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-[3rem]">
-        <ScheduleCard schedule={dummyData.customSchedule} isPrimary={true} index={0} />
+        <ScheduleCard schedule={customSchedule} isPrimary={true} index={0} />
       </div>
 
       <h3 className="form text-lg font-semibold mt-8 mb-4">Similar study schedules</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-[3rem]">
-        {dummyData.similarSchedules.map((schedule, index) => (
-          <ScheduleCard key={index} schedule={schedule} index={index + 1} />
+        {similarSchedules.map((schedule, idx) => (
+          <ScheduleCard key={idx} schedule={schedule} index={idx + 1} />
         ))}
       </div>
 
       <h3 className="text-lg font-semibold mt-8 mb-4">Targeting other exams as well?</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-[3rem]">
-        {dummyData.otherExams.map((schedule, index) => (
-          <ScheduleCard key={index} schedule={schedule} index={index + 5} />
+        {otherExams.map((schedule, idx) => (
+          <ScheduleCard key={idx} schedule={schedule} index={idx + 5} />
         ))}
       </div>
     </div>

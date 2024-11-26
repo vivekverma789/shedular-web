@@ -20,31 +20,34 @@ const Login = () => {
 
   const handleGoogleSuccess = (credentialResponse) => {
     console.log("Google Login Success:", credentialResponse);
-    // Send the token to the backend for verification and user login
+    const { credential } = credentialResponse;
+  
+    // Send the Google token to your backend to verify and create a session
     fetch("http://localhost:5000/api/auth/google", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ token: credentialResponse.credential }),
+      body: JSON.stringify({ token: credential }), // Send token instead of a GET request
+      credentials: "include", // To send cookies with the request
     })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         if (data.success) {
-          // Redirect to the dashboard or any other page on success
-          navigate("/dashboard");
+          navigate("/dashboard"); // Navigate to dashboard if login is successful
         }
       })
       .catch((error) => console.error("Google Login Error:", error));
   };
-
+  
+  
   const handleGoogleFailure = (error) => {
     console.error("Google Login Failed:", error);
   };
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <GoogleOAuthProvider clientId="811124239471-8qqo79nvq6854a868mtphdslnutlsnce.apps.googleusercontent.com">
       <div className="form flex justify-center items-center h-screen bg-gray-200">
         <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-sm">
           <div className="flex justify-end">

@@ -21,7 +21,7 @@ const Transfer = () => {
 
   // Handle option change and navigate to the selected route
   const handleOptionChange = (option) => {
-    navigate(option.route); // Directly navigate to the selected route
+    navigate(option.route, { state: { selectedOption: option.name } }); // Pass selected option name as state
   };
 
   return (
