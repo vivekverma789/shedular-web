@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./navbar.css";
+import api from "../apiConfig/apiConfig";
 
 const ExpertsCard = () => {
   const [experts, setExperts] = useState([]);
@@ -9,7 +9,7 @@ const ExpertsCard = () => {
   useEffect(() => {
     const fetchExperts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/experts");
+        const response = await api.get("/experts");
         setExperts(response.data);  // Store the fetched data in state
       } catch (error) {
         console.error("Failed to fetch experts:", error);

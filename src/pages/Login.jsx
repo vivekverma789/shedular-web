@@ -4,42 +4,40 @@ import google from "../assets/google.png";
 import "../components/navbar.css";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-
+import api from "../apiConfig/apiConfig";
 const Login = () => {
-  const [mobileNumber, setMobileNumber] = useState("");
   const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Mobile Number:", mobileNumber);
-  };
-
+   
   const handleBack = () => {
     navigate("/");
   };
 
-  const handleGoogleSuccess = (credentialResponse) => {
+  const handleGoogleSuccess = async (credentialResponse) => {
     console.log("Google Login Success:", credentialResponse);
     const { credential } = credentialResponse;
-  
-    // Send the Google token to your backend to verify and create a session
-    fetch("http://localhost:5000/api/auth/google", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ token: credential }), // Send token instead of a GET request
-      credentials: "include", // To send cookies with the request
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.success) {
-          navigate("/dashboard"); // Navigate to dashboard if login is successful
-        }
-      })
-      .catch((error) => console.error("Google Login Error:", error));
+
+    try {
+      const response = await api.post("/auth/google", { token: credential }); // Use api instance
+      const data = response.data;
+
+      console.log(data);
+
+      if (data.success) {
+        // Store token in localStorage
+        localStorage.setItem("authToken", data.authToken);
+        alert("Login successful!");
+
+        // Navigate to dashboard or any protected route
+        navigate("/");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error.message);
+      alert("Google login failed. Please try again.");
+    }
   };
+
   
   
   const handleGoogleFailure = (error) => {
@@ -56,42 +54,6 @@ const Login = () => {
           <div className="text-center mb-8">
             <img src={logo} alt="Scheduler" className="mx-auto mb-2" />
             <h2 className="heading text-xl font-bold text-[#1A6400]">Scheduler</h2>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="form text-sm">
-              <label className="block text-gray-700 text-sm font-semibold mb-2">
-                Mobile Number
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-600">+91 |</span>
-                <input
-                  type="text"
-                  value={mobileNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 10) {
-                      setMobileNumber(value);
-                    }
-                  }}
-                  maxLength={10}
-                  pattern="\d{10}"
-                  className="pl-14 py-2 w-full border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter mobile number"
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-[#8C7147] text-sm text-white py-2 rounded transition duration-300"
-            >
-              Continue
-            </button>
-          </form>
-
-          <div className="my-4 text-sm flex items-center justify-between">
-            <hr className="w-full border-t border-gray-300" />
-            <span className="mx-4 text-gray-500">OR</span>
-            <hr className="w-full border-t border-gray-300" />
           </div>
 
           <GoogleLogin

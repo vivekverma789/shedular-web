@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../components/navbar.css";
-import axios from "axios";
 import { useLocation } from "react-router-dom";
+import api from "../apiConfig/apiConfig";
 
 const RRB = () => {
   const location = useLocation();
@@ -43,11 +43,14 @@ console.log(selectedOption)
     formDataToSend.append("selectedGoal", selectedOption); // Add selected option to the form data
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/mutual-transfer/save",
+      const token = localStorage.getItem("authToken"); // Retrieve token from local storage
+
+      const response = await api.post(
+        "/mutual-transfer/save",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          Authorization: `Bearer ${token}`,
         }
       );
       alert("Form submitted successfully!");

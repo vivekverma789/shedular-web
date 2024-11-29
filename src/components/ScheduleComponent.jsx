@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./navbar.css";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../apiConfig/apiConfig";
 
 // Dummy data (replace with API call when backend is ready)
 
@@ -16,8 +16,14 @@ const ScheduleComponent = () => {
   useEffect(() => {
     const fetchPurchasedSchedules = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/purchased");
-        console.log(response.data);
+        const token = localStorage.getItem("authToken"); // Retrieve token from local storage
+
+        const response = await api.get("/purchased", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });  
+          console.log(response.data);
 
         // Transform the purchased schedules to the desired format
         const scheduleList = response.data.purchasedSchedules.map(schedule => ({
